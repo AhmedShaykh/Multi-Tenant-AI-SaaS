@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { syncUserToDatabase } from "@/lib/sync-user";
 import { Toaster } from "@/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/Navbar";
@@ -7,7 +8,6 @@ import { Inter } from "next/font/google";
 import { dark } from "@clerk/themes";
 import type { Metadata } from "next";
 import "./globals.css";
-import { syncUserToDatabase } from "@/lib/sync-user";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,7 +16,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Multi Tenant SAAS AI Application",
-  description: "Multi Tenant SAAS AI Application"
+  description: "Multi Tenant SAAS AI Application",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg"
+  }
 };
 
 export default async function RootLayout({

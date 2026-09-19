@@ -1,96 +1,94 @@
-import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
-    CardTitle,
+    CardTitle
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
     FileText,
     ArrowRight,
     Upload,
-    Users,
-    Brain,
+    Brain
 } from "lucide-react";
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma";
 
 interface OrgDashboardPageProps {
     params: Promise<{ orgSlug: string }>;
-}
+};
 
-const OrgDashboardPage = async ({
-    params,
-}: OrgDashboardPageProps) => {
+const OrgDashboardPage = async ({ params }: OrgDashboardPageProps) => {
+
     const { orgSlug } = await params;
+
     const { userId } = await auth();
 
     if (!userId) {
+
         redirect("/sign-in");
+
     }
 
-    // Get organization with stats
     const organization = await prisma.organization.findUnique({
         where: {
-            slug: orgSlug,
+            slug: orgSlug
         },
         include: {
             _count: {
                 select: {
                     documents: true,
-                    members: true,
-                },
+                    members: true
+                }
             },
             documents: {
                 take: 5,
                 orderBy: {
-                    createdAt: "desc",
-                },
-            },
-        },
+                    createdAt: "desc"
+                }
+            }
+        }
     });
 
     if (!organization) {
+
         redirect("/select-org");
+
     }
 
-    // Check membership
     const membership = await prisma.organizationMember.findFirst({
         where: {
             organizationId: organization.id,
             user: {
-                clerkUserId: userId,
-            },
-        },
+                clerkUserId: userId
+            }
+        }
     });
 
     if (!membership) {
+
         redirect("/select-org");
+
     }
 
-    // Count analyzed documents
     const analyzedDocs = await prisma.document.count({
         where: {
             organizationId: organization.id,
             aiSummary: {
-                not: null,
-            },
-        },
+                not: null
+            }
+        }
     });
 
     const totalDocuments = organization._count.documents;
 
-    const analyzedPercentage =
-        totalDocuments > 0
-            ? ((analyzedDocs / totalDocuments) * 100).toFixed(0)
-            : "0";
+    const analyzedPercentage = totalDocuments > 0 ? ((analyzedDocs / totalDocuments) * 100).toFixed(0) : "0";
 
     return (
         <div className="space-y-6 sm:space-y-8">
-            {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
                     {organization.name} Dashboard
@@ -101,14 +99,13 @@ const OrgDashboardPage = async ({
                 </p>
             </div>
 
-            {/* Stats */}
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
-                {/* Documents */}
                 <Card className="border-border bg-card">
                     <CardHeader>
                         <CardTitle className="text-base sm:text-lg">
                             Total Documents
                         </CardTitle>
+
                         <CardDescription>
                             In this organization
                         </CardDescription>
@@ -132,7 +129,6 @@ const OrgDashboardPage = async ({
                     </CardContent>
                 </Card>
 
-                {/* Team */}
                 <Card className="border-border bg-card">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -140,7 +136,7 @@ const OrgDashboardPage = async ({
                         </CardTitle>
 
                         <CardDescription>
-                            Organization members
+                            Organization Members
                         </CardDescription>
                     </CardHeader>
 
@@ -160,7 +156,6 @@ const OrgDashboardPage = async ({
                     </CardContent>
                 </Card>
 
-                {/* Analyzed */}
                 <Card className="border-border bg-card sm:col-span-2 lg:col-span-1">
                     <CardHeader>
                         <CardTitle className="text-base sm:text-lg">
@@ -178,13 +173,12 @@ const OrgDashboardPage = async ({
                         </div>
 
                         <p className="mt-1 text-sm text-muted-foreground">
-                            {analyzedPercentage}% analyzed
+                            {analyzedPercentage}% Analyzed
                         </p>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Recent Documents */}
             <Card className="border-border bg-card">
                 <CardHeader>
                     <CardTitle className="text-lg sm:text-xl">
@@ -198,7 +192,6 @@ const OrgDashboardPage = async ({
 
                 <CardContent>
                     {organization.documents.length === 0 ? (
-                        /* Empty State */
                         <div className="flex flex-col items-center justify-center py-10 text-center sm:py-12">
                             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/10">
                                 <FileText className="h-7 w-7 text-blue-500" />
@@ -226,12 +219,10 @@ const OrgDashboardPage = async ({
                                     key={doc.id}
                                     className="flex items-center gap-3 rounded-lg border border-border bg-background p-3 transition-colors hover:bg-muted/50 sm:p-4"
                                 >
-                                    {/* Document Icon */}
                                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10">
                                         <FileText className="h-5 w-5 text-blue-500" />
                                     </div>
 
-                                    {/* Document Info */}
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate text-sm font-medium sm:text-base">
                                             {doc.name}
@@ -239,13 +230,10 @@ const OrgDashboardPage = async ({
 
                                         <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
                                             Uploaded{" "}
-                                            {new Date(
-                                                doc.createdAt
-                                            ).toLocaleDateString()}
+                                            {new Date(doc.createdAt).toLocaleDateString()}
                                         </p>
                                     </div>
 
-                                    {/* Status */}
                                     <div className="shrink-0">
                                         {doc.aiSummary ? (
                                             <div
@@ -271,7 +259,7 @@ const OrgDashboardPage = async ({
                 </CardContent>
             </Card>
         </div>
-    );
+    )
 };
 
 export default OrgDashboardPage;

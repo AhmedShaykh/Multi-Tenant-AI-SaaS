@@ -9,7 +9,9 @@ const DashboardLayout = async ({
     const { userId } = await auth();
 
     if (!userId) {
+
         redirect("/sign-in");
+
     }
 
     return (

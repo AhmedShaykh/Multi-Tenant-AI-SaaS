@@ -1,6 +1,6 @@
 "use client";
-
 import { useRef, useState } from "react";
+import { allowedTypes } from "@/lib/static";
 import { useOrganization } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,179 +11,200 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
+    DialogTrigger
 } from "@/components/ui/dialog";
 import {
     Upload,
     Loader2,
     X,
-    FileText,
+    FileText
 } from "lucide-react";
 import { toast } from "sonner";
-import { allowedTypes } from "@/lib/static";
 
 interface DocumentUploadDialogProps {
     onUploadSuccess?: () => void;
     trigger?: React.ReactNode;
-}
+};
 
-const DocumentUploadDialog = ({
-    onUploadSuccess,
-    trigger,
-}: DocumentUploadDialogProps) => {
+const DocumentUploadDialog = ({ onUploadSuccess, trigger }: DocumentUploadDialogProps) => {
+
     const { organization } = useOrganization();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [isOpen, setIsOpen] = useState(false);
+
     const [isUploading, setIsUploading] = useState(false);
+
     const [documentName, setDocumentName] = useState("");
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const resetForm = () => {
+
         setDocumentName("");
+
         setSelectedFile(null);
 
         if (fileInputRef.current) {
+
             fileInputRef.current.value = "";
+
         }
+
     };
 
-    const handleFileSelect = (
-        e: React.ChangeEvent<HTMLInputElement>,
-    ) => {
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+
         const file = e.target.files?.[0];
 
         if (!file) return;
 
         if (file.size > 10 * 1024 * 1024) {
+
             toast.error("File size must be less than 10MB");
 
             if (fileInputRef.current) {
+
                 fileInputRef.current.value = "";
+
             }
 
             return;
+
         }
 
         if (!allowedTypes.includes(file.type)) {
-            toast.error(
-                "File type not supported. Please upload .txt, .pdf, .doc, .docx, or .md files",
-            );
+
+            toast.error("File type not supported");
 
             if (fileInputRef.current) {
+
                 fileInputRef.current.value = "";
+
             }
 
             return;
+
         }
 
         setSelectedFile(file);
 
-        setDocumentName(
-            file.name.replace(/\.[^/.]+$/, ""),
-        );
+        setDocumentName(file.name.replace(/\.[^/.]+$/, ""));
+
     };
 
-    const handleRemoveFile = (
-        e: React.MouseEvent<HTMLButtonElement>,
-    ) => {
+    const handleRemoveFile = (e: React.MouseEvent<HTMLButtonElement>) => {
+
         e.preventDefault();
+
         e.stopPropagation();
 
         setSelectedFile(null);
 
         if (fileInputRef.current) {
+
             fileInputRef.current.value = "";
+
         }
+
     };
 
     const handleUpload = async () => {
+
         if (!organization) {
-            toast.error("No organization selected");
+
+            toast.error("No Organization Selected");
+
             return;
+
         }
 
         if (!selectedFile) {
-            toast.error("Please select a file");
+
+            toast.error("Please Select A File");
+
             return;
+
         }
 
         if (!documentName.trim()) {
-            toast.error("Please enter a document name");
+
+            toast.error("Please Enter A Document Name");
+
             return;
+
         }
 
         setIsUploading(true);
 
         try {
+
             const formData = new FormData();
 
-            formData.append(
-                "name",
-                documentName.trim(),
-            );
+            formData.append("name", documentName.trim());
 
-            formData.append(
-                "organizationId",
-                organization.id,
-            );
+            formData.append("organizationId", organization.id);
 
-            formData.append(
-                "file",
-                selectedFile,
-            );
+            formData.append("file", selectedFile);
 
-            const response = await fetch(
-                "/api/documents",
-                {
-                    method: "POST",
-                    body: formData,
-                },
-            );
+            const response = await fetch("/api/documents", {
+                method: "POST",
+                body: formData
+            });
 
             if (!response.ok) {
-                let errorMessage = "Upload failed";
+
+                let errorMessage = "Upload Failed";
 
                 try {
+
                     const error = await response.json();
+
                     errorMessage = error.error || errorMessage;
+
                 } catch {
-                    // Ignore invalid JSON response
+
+                    errorMessage = "Upload Failed. Please Try Again.";
+
                 }
 
                 throw new Error(errorMessage);
+
             }
 
-            toast.success(
-                "Document uploaded successfully!",
-            );
+            toast.success("Document Uploaded Successfully!");
 
             resetForm();
+
             setIsOpen(false);
 
             onUploadSuccess?.();
-        } catch (error) {
-            console.error("Upload error:", error);
 
-            toast.error(
-                error instanceof Error
-                    ? error.message
-                    : "Upload failed",
-            );
+        } catch (error) {
+
+            console.error("Upload Error:", error);
+
+            toast.error(error instanceof Error ? error.message : "Upload Failed");
+
         } finally {
+
             setIsUploading(false);
+
         }
+
     };
 
-    const handleDialogOpenChange = (
-        open: boolean,
-    ) => {
+    const handleDialogOpenChange = (open: boolean) => {
+
         setIsOpen(open);
 
         if (!open && !isUploading) {
+
             resetForm();
+
         }
+
     };
 
     return (
@@ -212,7 +233,6 @@ const DocumentUploadDialog = ({
                 </DialogHeader>
 
                 <div className="space-y-5 py-2">
-                    {/* Document Name */}
                     <div className="space-y-2">
                         <label
                             htmlFor="document-name"
@@ -226,15 +246,12 @@ const DocumentUploadDialog = ({
                             id="document-name"
                             placeholder="Enter document name"
                             value={documentName}
-                            onChange={(e) =>
-                                setDocumentName(e.target.value)
-                            }
+                            onChange={(e) => setDocumentName(e.target.value)}
                             disabled={isUploading}
                             className="h-11"
                         />
                     </div>
 
-                    {/* File Upload */}
                     <div className="space-y-2">
                         <label
                             htmlFor="file-upload"
@@ -260,7 +277,6 @@ const DocumentUploadDialog = ({
                             >
                                 {selectedFile ? (
                                     <>
-                                        {/* Selected File */}
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
                                             <FileText className="h-6 w-6 text-blue-500" />
                                         </div>
@@ -270,11 +286,7 @@ const DocumentUploadDialog = ({
                                         </p>
 
                                         <p className="mt-1 text-xs text-muted-foreground">
-                                            {(
-                                                selectedFile.size /
-                                                (1024 * 1024)
-                                            ).toFixed(2)}{" "}
-                                            MB
+                                            {(selectedFile.size / (1024 * 1024)).toFixed(2)}{" "}MB
                                         </p>
 
                                         <Button
@@ -291,7 +303,6 @@ const DocumentUploadDialog = ({
                                     </>
                                 ) : (
                                     <>
-                                        {/* Empty Upload */}
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
                                             <Upload className="h-6 w-6 text-blue-500" />
                                         </div>
@@ -314,7 +325,6 @@ const DocumentUploadDialog = ({
                     </div>
                 </div>
 
-                {/* Footer */}
                 <DialogFooter className="flex-col gap-2 sm:flex-row">
                     <Button
                         type="button"
@@ -354,4 +364,4 @@ const DocumentUploadDialog = ({
     );
 };
 
-export { DocumentUploadDialog };
+export default DocumentUploadDialog;

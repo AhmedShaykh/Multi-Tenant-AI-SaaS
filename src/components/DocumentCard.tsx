@@ -1,5 +1,7 @@
+import { AnalysisType, Document as AppDocument } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { analysisTypes } from "@/lib/static";
 import {
     FileText,
     Brain,
@@ -10,7 +12,7 @@ import {
     User,
     Tag,
     File,
-    Sparkles,
+    Sparkles
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import {
@@ -18,10 +20,8 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
+    SelectValue
 } from "@/components/ui/select";
-import { AnalysisType, Document as AppDocument } from "@/lib/types";
-import { analysisTypes } from "@/lib/static";
 
 interface DocumentCardProps {
     document: AppDocument;
@@ -33,7 +33,7 @@ interface DocumentCardProps {
     onToggleSummary: (documentId: string) => void;
     expandedSummaries: Set<string>;
     formatFileSize: (bytes?: number) => string;
-}
+};
 
 const DocumentCard = ({
     document: doc,
@@ -46,22 +46,22 @@ const DocumentCard = ({
     expandedSummaries,
     formatFileSize,
 }: DocumentCardProps) => {
+
     const isExpanded = expandedSummaries.has(doc.id);
 
     const getAnalysisIcon = (type: AnalysisType) => {
-        const analysisType = analysisTypes.find(
-            (item) => item.value === type,
-        );
+
+        const analysisType = analysisTypes.find((item) => item.value === type);
 
         const Icon = analysisType?.icon || Sparkles;
 
         return <Icon className="h-4 w-4" />;
+
     };
 
     return (
         <div className="rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md sm:p-6">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-                {/* Document Info */}
                 <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 sm:h-12 sm:w-12">
                         <FileText className="h-5 w-5 text-blue-500 sm:h-6 sm:w-6" />
@@ -77,6 +77,7 @@ const DocumentCard = ({
                                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-muted-foreground sm:text-sm">
                                     <span className="flex min-w-0 items-center gap-1">
                                         <User className="h-3 w-3 shrink-0" />
+
                                         <span className="max-w- truncate">
                                             {doc.user.name || doc.user.email}
                                         </span>
@@ -84,9 +85,7 @@ const DocumentCard = ({
 
                                     <span className="flex items-center gap-1">
                                         <Calendar className="h-3 w-3 shrink-0" />
-                                        {new Date(
-                                            doc.createdAt,
-                                        ).toLocaleDateString()}
+                                        {new Date(doc.createdAt).toLocaleDateString()}
                                     </span>
 
                                     {doc.fileSize && (
@@ -113,9 +112,11 @@ const DocumentCard = ({
                                 <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="flex flex-wrap items-center gap-2">
                                         <Brain className="h-5 w-5 text-green-500" />
+
                                         <span className="font-medium">
                                             AI Analysis
                                         </span>
+
                                         <Badge
                                             variant="outline"
                                             className="text-xs"
@@ -129,14 +130,10 @@ const DocumentCard = ({
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            onClick={() =>
-                                                onToggleSummary(doc.id)
-                                            }
+                                            onClick={() => onToggleSummary(doc.id)}
                                             className="w-fit"
                                         >
-                                            {isExpanded
-                                                ? "Show less"
-                                                : "Read more"}
+                                            {isExpanded ? "Show less" : "Read more"}
                                         </Button>
                                     )}
                                 </div>
@@ -217,9 +214,7 @@ const DocumentCard = ({
 
                     <div className="space-y-2">
                         <div className="text-xs text-muted-foreground">
-                            {doc.aiSummary
-                                ? "Re-analyze with:"
-                                : "Analyze with:"}
+                            {doc.aiSummary ? "Re-analyze with:" : "Analyze with:"}
                         </div>
 
                         <Select
@@ -236,14 +231,9 @@ const DocumentCard = ({
                                         {getAnalysisIcon(
                                             selectedAnalysisType,
                                         )}
+
                                         <span className="truncate">
-                                            {
-                                                analysisTypes.find(
-                                                    (type) =>
-                                                        type.value ===
-                                                        selectedAnalysisType,
-                                                )?.label
-                                            }
+                                            {analysisTypes.find((type) => type.value === selectedAnalysisType)?.label}
                                         </span>
                                     </div>
                                 </SelectValue>
@@ -269,11 +259,7 @@ const DocumentCard = ({
 
                         <Button
                             type="button"
-                            variant={
-                                doc.aiSummary
-                                    ? "outline"
-                                    : "default"
-                            }
+                            variant={doc.aiSummary ? "outline" : "default"}
                             size="sm"
                             onClick={() => onAnalyze(doc.id)}
                             disabled={isAnalyzing}
@@ -282,16 +268,12 @@ const DocumentCard = ({
                             {isAnalyzing ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    {doc.aiSummary
-                                        ? "Re-analyzing..."
-                                        : "Analyzing..."}
+                                    {doc.aiSummary ? "Re-analyzing..." : "Analyzing..."}
                                 </>
                             ) : (
                                 <>
                                     <Brain className="mr-2 h-4 w-4" />
-                                    {doc.aiSummary
-                                        ? "Re-analyze"
-                                        : "Analyze"}
+                                    {doc.aiSummary ? "Re-analyze" : "Analyze"}
                                 </>
                             )}
                         </Button>
@@ -313,4 +295,4 @@ const DocumentCard = ({
     );
 };
 
-export { DocumentCard };
+export default DocumentCard;

@@ -1,23 +1,21 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-
+import Image from "next/image";
+import Link from "next/link";
 import {
     SignedIn,
     SignedOut,
     UserButton,
     useUser,
-    useOrganization,
+    useOrganization
 } from "@clerk/nextjs";
-
-import { Button } from "@/components/ui/button";
 import {
     Sheet,
     SheetContent,
-    SheetTrigger,
+    SheetTrigger
 } from "@/components/ui/sheet";
-
 import {
     Menu,
     Home,
@@ -26,43 +24,50 @@ import {
     Brain,
     LogIn,
     UserPlus,
-    Building,
+    Building
 } from "lucide-react";
 
 const Navbar = () => {
+
     const pathname = usePathname();
+
     const { user } = useUser();
+
     const { organization } = useOrganization();
+
     const [isOpen, setIsOpen] = useState(false);
 
     const getNavItems = () => {
+
         const baseItems = [
             {
                 href: "/",
                 label: "Home",
-                icon: <Home className="h-4 w-4" />,
-            },
+                icon: <Home className="h-4 w-4" />
+            }
         ];
 
         if (organization) {
+
             return [
                 ...baseItems,
                 {
                     href: `/${organization.slug}`,
                     label: "Dashboard",
-                    icon: <Building className="h-4 w-4" />,
+                    icon: <Building className="h-4 w-4" />
                 },
                 {
                     href: `/${organization.slug}/documents`,
                     label: "Documents",
-                    icon: <FileText className="h-4 w-4" />,
+                    icon: <FileText className="h-4 w-4" />
                 },
                 {
                     href: "/select-org",
                     label: "Switch Organization",
-                    icon: <Users className="h-4 w-4" />,
-                },
+                    icon: <Users className="h-4 w-4" />
+                }
             ];
+
         }
 
         return [
@@ -70,9 +75,10 @@ const Navbar = () => {
             {
                 href: "/select-org",
                 label: "Switch Organization",
-                icon: <Users className="h-4 w-4" />,
-            },
+                icon: <Users className="h-4 w-4" />
+            }
         ];
+
     };
 
     const navItems = getNavItems();
@@ -87,21 +93,23 @@ const Navbar = () => {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
             <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
-
-                {/* Logo */}
                 <Link
+                    className="flex shrink-0"
                     href="/"
-                    className="flex shrink-0 items-center gap-2 text-lg font-bold sm:text-xl"
                 >
-                    <Brain className="h-6 w-6 text-blue-500" />
-                    <span>DocuAI</span>
+                    <Image
+                        src="/Logo.svg"
+                        alt="Logo"
+                        width={80}
+                        height={55}
+                        className="h-10 w-22 cursor-pointer"
+                        priority
+                    />
                 </Link>
 
-                {/* Desktop Navigation */}
                 <nav className="hidden items-center gap-1 md:flex">
                     {navItems.map((item) => {
                         const active = isActiveRoute(item.href);
-
                         return (
                             <Link key={item.href} href={item.href}>
                                 <Button
@@ -117,7 +125,6 @@ const Navbar = () => {
                     })}
                 </nav>
 
-                {/* Desktop Auth */}
                 <div className="hidden items-center gap-3 md:flex">
                     <SignedIn>
                         <div className="flex items-center gap-3">
@@ -150,7 +157,6 @@ const Navbar = () => {
                     </SignedOut>
                 </div>
 
-                {/* Mobile Menu */}
                 <div className="md:hidden">
                     <Sheet open={isOpen} onOpenChange={setIsOpen}>
                         <SheetTrigger>
@@ -165,11 +171,8 @@ const Navbar = () => {
                             className="w-[85%] max-w-sm bg-background px-5"
                         >
                             <div className="mt-8 flex flex-col gap-2">
-
-                                {/* Mobile Navigation */}
                                 {navItems.map((item) => {
                                     const active = isActiveRoute(item.href);
-
                                     return (
                                         <Link
                                             key={item.href}
@@ -187,7 +190,6 @@ const Navbar = () => {
                                     );
                                 })}
 
-                                {/* Mobile Auth */}
                                 <div className="mt-4 border-t border-border pt-5">
                                     <SignedIn>
                                         <div className="space-y-4">
@@ -223,7 +225,7 @@ const Navbar = () => {
                                                 href="/sign-up"
                                                 onClick={() => setIsOpen(false)}
                                             >
-                                                <Button className="w-full">
+                                                <Button className="w-full mt-2">
                                                     <UserPlus className="mr-2 h-4 w-4" />
                                                     Sign Up
                                                 </Button>

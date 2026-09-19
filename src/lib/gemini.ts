@@ -13,7 +13,7 @@ if (!apiKey) {
 
 const model = new ChatGoogleGenerativeAI({
     apiKey,
-    model: "gemini-2.5-flash",
+    model: "gemini-3.6-flash",
     temperature: 0.3,
     maxRetries: 2
 });
@@ -39,15 +39,17 @@ const chain = prompt.pipe(model).pipe(new StringOutputParser());
 
 export async function analyzeWithGemini(text: string, analysisType: AnalysisType) {
 
+    const instruction = instructions[analysisType] ?? instructions.summary;
+
     try {
 
-        return await chain.invoke({ instruction: instructions[analysisType], text });
+        return await chain.invoke({ instruction, text });
 
-    } catch (error) {
+    } catch (error: any) {
 
-        console.log("Gemini Error:", error);
+        console.error("Gemini Error:", error?.message ?? error);
 
-        return `Could Not Analyze For ${analysisType}`;
+        throw new Error(error?.message || "Gemini Analysis Failed");
 
     };
 

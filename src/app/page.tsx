@@ -1,18 +1,12 @@
 import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
-import { CheckCircle } from "lucide-react";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { features, steps } from "@/lib/static";
+import { CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 const App = () => {
     return (
         <main className="min-h-screen bg-background text-foreground">
-            {/* Hero */}
             <section className="border-b bg-background py-16 sm:py-20 lg:py-28">
                 <div className="container mx-auto max-w-5xl px-4 text-center sm:px-6">
                     <h1 className="mx-auto max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -29,7 +23,7 @@ const App = () => {
 
                     <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
                         <Link href="/sign-up" className="w-full sm:w-auto">
-                            <Button size="lg" className="w-full px-8 sm:w-auto">
+                            <Button size="lg" className="w-full px-8 sm:w-auto font-semibold">
                                 Start Free Trial
                             </Button>
                         </Link>
@@ -47,7 +41,6 @@ const App = () => {
                 </div>
             </section>
 
-            {/* Features */}
             <section
                 id="features"
                 className="bg-muted/30 py-16 sm:py-20"
@@ -67,7 +60,6 @@ const App = () => {
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {features.map((feature, index) => {
                             const Icon = feature.icon;
-
                             return (
                                 <Card
                                     key={index}
@@ -87,13 +79,12 @@ const App = () => {
                                         </CardDescription>
                                     </CardHeader>
                                 </Card>
-                            );
+                            )
                         })}
                     </div>
                 </div>
             </section>
 
-            {/* How It Works */}
             <section className="border-b bg-background py-16 sm:py-20">
                 <div className="container mx-auto max-w-4xl px-4 sm:px-6">
                     <div className="mb-10 text-center sm:mb-12">
@@ -125,15 +116,14 @@ const App = () => {
                 </div>
             </section>
 
-            {/* CTA */}
             <section className="bg-gradient-to-br from-blue-500/10 via-background to-purple-500/10 py-16 sm:py-20 lg:py-24">
                 <div className="container mx-auto max-w-4xl px-4 text-center sm:px-6">
                     <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                        Ready to analyze your documents?
+                        Ready To Analyze Your Documents
                     </h2>
 
                     <p className="mx-auto mt-4 max-w-2xl text-muted-foreground sm:text-lg">
-                        Join teams using DocuAI to work smarter with their documents.
+                        Join teams using XYFORA AI to work smarter with their documents.
                     </p>
 
                     <div className="mt-8">
@@ -144,8 +134,8 @@ const App = () => {
                         </Link>
                     </div>
 
-                    <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
-                        No credit card required • 14-day free trial
+                    <p className="mt-4 text-md text-muted-foreground font-medium sm:text-sm">
+                        No Credit Card Required • 14-day Free Trial
                     </p>
                 </div>
             </section>
